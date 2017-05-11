@@ -1,0 +1,20 @@
+language: bash
+services: docker
+sudo: required
+
+install:
+  - docker run --rm --privileged multiarch/qemu-user-static:register
+  - git clone https://github.com/tianon/dockerfiles
+  - cd dockerfiles/prometheus
+  - patch Dockerfile ../../Dockerfile.patch
+  
+script:
+# Build
+  - docker build -t napnap75/rpi-prometheus:latest .
+# Check
+  - docker images
+
+after_success:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker push napnap75/rpi-prometheus:latest
+  
