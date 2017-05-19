@@ -1,12 +1,13 @@
-1c1
-< FROM alpine:3.4
+1,2c1
+< FROM armhf/alpine:3.4
+< ADD qemu-arm-static /usr/bin
 ---
-> FROM armhf/lpine:3.4
-6c6
-< ENV PROMETHEUS_VERSION 1.2.1
+> FROM alpine:3.4
+7c6
+< ENV PROMETHEUS_VERSION 1.6.2
 ---
-> ENV PROMETHEUS_VERSION 1.6.2
-16c16
-<   wget -O /tmp/prom.tar.gz "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz"; \
+> ENV PROMETHEUS_VERSION 1.2.1
+17c16
+< 	wget -O /tmp/prom.tar.gz "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-armv7.tar.gz"; \
 ---
->   wget -O /tmp/prom.tar.gz "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-armv7.tar.gz"; \
+> 	wget -O /tmp/prom.tar.gz "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz"; \
