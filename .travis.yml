@@ -19,6 +19,6 @@ script:
 after_success:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker push napnap75/rpi-prometheus:latest
-  - VERSION=$(docker run --rm prometheus prometheus -version | grep "prometheus, version" | egrep -o "[0-9]\.[0-9]\.[0-9]")
+  - VERSION=$(docker run --rm napnap75/rpi-prometheus:latest prometheus -version | grep "prometheus, version" | egrep -o "[0-9]\.[0-9]\.[0-9]")
   - docker tag napnap75/rpi-prometheus:latest napnap75/rpi-prometheus:$VERSION
   - docker push napnap75/rpi-prometheus:$VERSION  
