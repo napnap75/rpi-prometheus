@@ -11,7 +11,7 @@ install:
 script:
 # Build
   - curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz && tar xzf qemu-arm-static.tar.gz
-  - curl -L -o prometheus.tar.gz https://github.com/prometheus/prometheus/releases/download/v1.6.3/prometheus-1.6.3.linux-armv7.tar.gz && tar −−strip−components=1 -x -z -f prometheus.tar.gz
+  - curl -L -o prometheus.tar.gz https://github.com/prometheus/prometheus/releases/download/v1.6.3/prometheus-1.6.3.linux-armv7.tar.gz && tar xz −−strip−components=1 -f prometheus.tar.gz
   - ls -al
   - docker build -t napnap75/rpi-prometheus:latest .
 # Check
