@@ -5,6 +5,7 @@ sudo: required
 env:
   - IMAGE=prometheus
   - IMAGE=node_exporter
+  - IMAGE=alertmanager
   
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
