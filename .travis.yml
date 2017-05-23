@@ -6,6 +6,7 @@ env:
   - IMAGE=prometheus
   - IMAGE=node_exporter
   - IMAGE=alertmanager
+  - IMAGE=blackbox_exporter
   
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
