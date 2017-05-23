@@ -5,7 +5,8 @@ The changes from the original images are :
 - built from armhf/alpine instead of busybox (QEmu does not work with Busybox)
 
 The following images are available as tags of napnap75/rpi-prometheus :
-- prometheus : the main program
+- prometheus : The Prometheus monitoring system and time series database
+- node_exporter : Prometheus exporter for hardware and OS metrics
 
 The source code is available [here](https://github.com/napnap75/rpi-prometheus) and the images [here](https://hub.docker.com/r/napnap75/rpi-prometheus/).
 
