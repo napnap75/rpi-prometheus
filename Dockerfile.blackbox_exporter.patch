@@ -1,4 +1,4 @@
-1,2c1,3
+1,2c1,2
 < FROM        quay.io/prometheus/busybox:latest
 < MAINTAINER  The Prometheus Authors <prometheus-developers@googlegroups.com>
 ---
