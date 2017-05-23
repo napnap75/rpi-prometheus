@@ -8,19 +8,16 @@ env:
   
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
-
-before_script:
-  - env | sort
-  - git clone https://github.com/prometheus/${IMAGE}
-  - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}.patch
   
 script:
 # Download
+  - git clone https://github.com/prometheus/${IMAGE}
   - curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz && tar zx -f qemu-arm-static.tar.gz -C ${IMAGE}
   - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-armv7" | cut -d\" -f4)
-  - echo ${DOWNLOAD_URL}
   - curl -L -o ${IMAGE}.tar.gz ${DOWNLOAD_URL} && tar zx -f ${IMAGE}.tar.gz --strip-components=1 -C ${IMAGE}
 # Build
+  - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}.patch
+  - cat ${IMAGE}/Dockerfile
   - docker build -t napnap75/rpi-prometheus:${IMAGE} ${IMAGE}
 # Check
   - docker images
