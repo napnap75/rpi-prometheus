@@ -4,19 +4,19 @@ sudo: required
 
 env:
   - IMAGE=prometheus
+  - IMAGE=node_exporter
   
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
-
-before_script:
-  - env | sort
-  - git clone https://github.com/prometheus/${IMAGE}
-  - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}.patch
   
 script:
-# Build
+# Download
+  - git clone https://github.com/prometheus/${IMAGE}
   - curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz && tar zx -f qemu-arm-static.tar.gz -C ${IMAGE}
-  - curl -L -o prometheus.tar.gz https://github.com/prometheus/prometheus/releases/download/v1.6.3/prometheus-1.6.3.linux-armv7.tar.gz && tar zx -f ${IMAGE}.tar.gz --strip-components=1 -C ${IMAGE}
+  - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-armv7" | cut -d\" -f4)
+  - curl -L -o ${IMAGE}.tar.gz ${DOWNLOAD_URL} && tar zx -f ${IMAGE}.tar.gz --strip-components=1 -C ${IMAGE}
+# Build
+  - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}.patch
   - docker build -t napnap75/rpi-prometheus:${IMAGE} ${IMAGE}
 # Check
   - docker images
@@ -25,6 +25,6 @@ script:
 after_success:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker push napnap75/rpi-prometheus:${IMAGE}
-  - VERSION=$(docker run --rm napnap75/rpi-prometheus:${IMAGE} -version | grep "prometheus, version" | egrep -o "[0-9]\.[0-9]\.[0-9]")
+  - VERSION=$(docker run --rm napnap75/rpi-prometheus:${IMAGE} -version | grep "${IMAGE}, version" | egrep -o "[0-9]+\.[0-9]+\.[0-9]+")
   - docker tag napnap75/rpi-prometheus:${IMAGE} napnap75/rpi-prometheus:${IMAGE}-$VERSION
   - docker push napnap75/rpi-prometheus:${IMAGE}-$VERSION  
