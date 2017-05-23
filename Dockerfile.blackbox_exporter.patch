@@ -1,0 +1,6 @@
+1,2c1,3
+< FROM        quay.io/prometheus/busybox:latest
+< MAINTAINER  The Prometheus Authors <prometheus-developers@googlegroups.com>
+---
+> FROM armhf/alpine:latest
+> ADD qemu-arm-static /usr/bin
