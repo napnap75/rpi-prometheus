@@ -2,23 +2,29 @@ language: bash
 services: docker
 sudo: required
 
+env:
+  - IMAGE=prometheus
+  
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
-  - git clone https://github.com/tianon/dockerfiles
-  - cd dockerfiles/prometheus
-  - patch Dockerfile ../../Dockerfile.patch
+
+before_script:
+  - env | sort
+  - git clone https://github.com/prometheus/${IMAGE}
+  - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}.patch
   
 script:
 # Build
-  - curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz && tar xzf qemu-arm-static.tar.gz
-  - docker build -t napnap75/rpi-prometheus:latest .
+  - curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz && tar zx -f qemu-arm-static.tar.gz -C ${IMAGE}
+  - curl -L -o prometheus.tar.gz https://github.com/prometheus/prometheus/releases/download/v1.6.3/prometheus-1.6.3.linux-armv7.tar.gz && tar zx -f ${IMAGE}.tar.gz --strip-components=1 -C ${IMAGE}
+  - docker build -t napnap75/rpi-prometheus:${IMAGE} ${IMAGE}
 # Check
   - docker images
-  - docker run --rm napnap75/rpi-prometheus:latest prometheus -version
+  - docker run --rm napnap75/rpi-prometheus:${IMAGE} -version
 
 after_success:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker push napnap75/rpi-prometheus:latest
-  - VERSION=$(docker run --rm napnap75/rpi-prometheus:latest prometheus -version | grep "prometheus, version" | egrep -o "[0-9]\.[0-9]\.[0-9]")
-  - docker tag napnap75/rpi-prometheus:latest napnap75/rpi-prometheus:$VERSION
-  - docker push napnap75/rpi-prometheus:$VERSION  
+  - docker push napnap75/rpi-prometheus:${IMAGE}
+  - VERSION=$(docker run --rm napnap75/rpi-prometheus:${IMAGE} -version | grep "prometheus, version" | egrep -o "[0-9]\.[0-9]\.[0-9]")
+  - docker tag napnap75/rpi-prometheus:${IMAGE} napnap75/rpi-prometheus:${IMAGE}-$VERSION
+  - docker push napnap75/rpi-prometheus:${IMAGE}-$VERSION  
