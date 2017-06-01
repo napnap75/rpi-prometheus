@@ -29,7 +29,7 @@ after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" ;
       docker push napnap75/rpi-prometheus:${IMAGE} ;
-      VERSION=$(docker run --rm napnap75/rpi-prometheus:${IMAGE} -version | grep "${IMAGE}, version" | egrep -o "[0-9]+\.[0-9]+\.[0-9]+") ;
+      VERSION=$(docker run --rm napnap75/rpi-prometheus:${IMAGE} -version ${OPTIONS} | grep "${IMAGE}, version" | egrep -o "[0-9]+\.[0-9]+\.[0-9]+") ;
       docker tag napnap75/rpi-prometheus:${IMAGE} napnap75/rpi-prometheus:${IMAGE}-${VERSION} ;
       docker push napnap75/rpi-prometheus:${IMAGE}-${VERSION} ;
     fi
