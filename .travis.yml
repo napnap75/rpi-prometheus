@@ -22,7 +22,7 @@ script:
   - docker build -t napnap75/rpi-prometheus:${IMAGE} ${IMAGE}
 # Check
   - docker images
-  - docker run --rm napnap75/rpi-prometheus:${IMAGE} -version
+  - docker run --rm napnap75/rpi-prometheus:${IMAGE} -version -mesh.peer-id=test
 
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
