@@ -26,7 +26,6 @@ script:
   - docker run --rm napnap75/rpi-prometheus:${IMAGE} -version ${OPTIONS}
     
 after_success:
-  - echo ${OPTIONS} 
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" ;
       docker push napnap75/rpi-prometheus:${IMAGE} ;
