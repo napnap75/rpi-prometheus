@@ -1,7 +1,7 @@
 1c1,2
 < FROM        quay.io/prometheus/busybox:latest
 ---
-> FROM armhf/alpine:latest
+> FROM arm32v6/alpine:latest
 > ADD qemu-arm-static /usr/bin
 17a19
 >              "-storage.local.target-heap-size=104857600", \

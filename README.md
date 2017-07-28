@@ -2,7 +2,7 @@ This is a clone of [the official Prometheus images](https://hub.docker.com/u/pro
 
 The changes from the original images are :
 - added QEmu in the image to allow it to be build on x86 systems (Travis CI)
-- built from armhf/alpine instead of busybox (QEmu does not work with Busybox)
+- built from arm32v6/alpine instead of busybox (QEmu does not work with Busybox)
 
 The following images are available as tags of napnap75/rpi-prometheus :
 - prometheus : The Prometheus monitoring system and time series database

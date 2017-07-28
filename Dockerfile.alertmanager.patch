@@ -1,5 +1,5 @@
 1c1,2
 < FROM        prom/busybox:latest
 ---
-> FROM armhf/alpine:latest
+> FROM arm32v6/alpine:latest
 > ADD qemu-arm-static /usr/bin
