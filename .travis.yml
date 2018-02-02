@@ -29,7 +29,7 @@ script:
   - docker build -t napnap75/rpi-prometheus:${IMAGE} ${IMAGE}
 # Check
   - docker images
-  - OPTIONS=$(if [ "$IMAGE" == "alertmanager" ]; then echo "-mesh.peer-id=test" ; fi)
+  - OPTIONS=$(if [ "$IMAGE" == "alertmanager" ]; then echo "--mesh.peer-id=test" ; fi)
   - docker run --rm napnap75/rpi-prometheus:${IMAGE} --version ${OPTIONS}
     
 after_success:
