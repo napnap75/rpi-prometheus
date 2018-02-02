@@ -7,11 +7,3 @@
  LABEL maintainer "The Prometheus Authors <prometheus-developers@googlegroups.com>"
  
  COPY prometheus                             /bin/prometheus
-@@ -17,6 +18,7 @@
- WORKDIR    /prometheus
- ENTRYPOINT [ "/bin/prometheus" ]
- CMD        [ "--config.file=/etc/prometheus/prometheus.yml", \
-+             "--storage.local.target-heap-size=104857600", \
-              "--storage.tsdb.path=/prometheus", \
-              "--web.console.libraries=/usr/share/prometheus/console_libraries", \
-              "--web.console.templates=/usr/share/prometheus/consoles" ]
