@@ -10,23 +10,23 @@ notifications:
     on_success: change
 
 
+env:
+  global:
+    - REGISTRY=carlosedp
+    - QEMU_VERSION=v2.11.0
+  matrix:
+    - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=prometheus TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+    - IMAGE=node_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+    - IMAGE=alertmanager TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+    - IMAGE=blackbox_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+
 jobs:
   include:
   - stage: build
-      env:
-        global:
-          - REGISTRY=carlosedp
-          - QEMU_VERSION=v2.11.0
-        matrix:
-          - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
-          - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
-          - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
-          - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
-          - IMAGE=prometheus TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
-          - IMAGE=node_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
-          - IMAGE=alertmanager TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
-          - IMAGE=blackbox_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
-
       install:
         - docker run --rm --privileged multiarch/qemu-user-static:register
 
@@ -53,14 +53,10 @@ jobs:
 
     - stage: deploy
       env:
-        global:
-          - REGISTRY=carlosedp
-          - QEMU_VERSION=v2.11.0
-        matrix:
-          - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
-          - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
-          - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
-          - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+        - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
+        - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+        - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
+        - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
 
       before_install:
         - echo "No before_install"
