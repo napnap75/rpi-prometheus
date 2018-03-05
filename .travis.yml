@@ -31,17 +31,17 @@ script:
   - git clone https://github.com/prometheus/${IMAGE}
   - curl -L -o qemu-${QEMU_ARCH}-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/${QEMU_VERSION}/qemu-${QEMU_ARCH}-static.tar.gz && tar zx -f qemu-${QEMU_ARCH}-static.tar.gz -C ${IMAGE}
   - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-${ARCH}" | cut -d\" -f4)
-  - VERSION=v`echo ${DOWNLOAD_URL}|sed 's/.*v\([0-9.]*\).*/\1/'`
-
+  - VERSION=v$(echo ${DOWNLOAD_URL}|sed 's/.*v\([0-9.]*\).*/\1/')
+  - echo Processing ${IMAGE} version ${VERSION}
   - curl -L -o ${IMAGE}.tar.gz ${DOWNLOAD_URL} && tar zx -f ${IMAGE}.tar.gz --strip-components=1 -C ${IMAGE}
 # Build
   - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}-${TAG}.patch
   - docker build -t ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} ${IMAGE}
 # Check
   - docker images
-  - if [ ! "$IMAGE" == "alertmanager" ] ; then
-      docker run --rm ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} --version ;
-    fi
+  #- if [ ! "${IMAGE}" == "alertmanager" ] ; then
+  #    docker run --rm ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} --version ;
+  #  fi
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" ;
       docker push ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} ;
@@ -56,7 +56,7 @@ jobs:
         - echo "No before_script"
       script:
         - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-${ARCH}" | cut -d\" -f4)
-        - VERSION=v`echo ${DOWNLOAD_URL}|sed 's/.*v\([0-9.]*\).*/\1/'`
+        - VERSION=v$(echo ${DOWNLOAD_URL}|sed 's/.*v\([0-9.]*\).*/\1/')
         - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
         - echo "Downloading manifest-tool"
         - wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
@@ -66,13 +66,13 @@ jobs:
         - echo "Pushing manifest ${REGISTRY}/${IMAGE}:latest"
 
         - ./manifest-tool push from-args --platforms linux/arm,linux/arm64 --template "${REGISTRY}/${IMAGE}:${VERSION}-ARCH" --target "${REGISTRY}/${IMAGE}:latest"
-        - ./manifest-tool push from-args --platforms linux/arm,linux/arm64 --template "${REGISTRY}/${IMAGE}:${VERSION}-ARCH" --target "${REGISTRY}/${IMAGE}:$VERSION"
+        - ./manifest-tool push from-args --platforms linux/arm,linux/arm64 --template "${REGISTRY}/${IMAGE}:${VERSION}-ARCH" --target "${REGISTRY}/${IMAGE}:${VERSION}"
       env:
         global:
           - REGISTRY=carlosedp
           - QEMU_VERSION=v2.11.0
-      matrix:
-        - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
-        - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
-        - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
-        - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+        matrix:
+          - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
+          - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+          - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
+          - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
