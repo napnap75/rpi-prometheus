@@ -1,0 +1,9 @@
+--- Dockerfile.x86
++++ Dockerfile.arm
+@@ -1,4 +1,5 @@
+-FROM        quay.io/prometheus/busybox:latest
++FROM arm32v6/alpine:latest
++ADD qemu-arm-static /usr/bin
+ LABEL maintainer "The Prometheus Authors <prometheus-developers@googlegroups.com>"
+
+ COPY prometheus                             /bin/prometheus
