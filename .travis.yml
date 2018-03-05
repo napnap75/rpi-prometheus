@@ -42,8 +42,6 @@ script:
   - if [ ! "$IMAGE" == "alertmanager" ] ; then
       docker run --rm ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} --version ;
     fi
-
-after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" ;
       docker push ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} ;
@@ -70,8 +68,11 @@ jobs:
         - ./manifest-tool push from-args --platforms linux/arm,linux/arm64 --template "${REGISTRY}/${IMAGE}:${VERSION}-ARCH" --target "${REGISTRY}/${IMAGE}:latest"
         - ./manifest-tool push from-args --platforms linux/arm,linux/arm64 --template "${REGISTRY}/${IMAGE}:${VERSION}-ARCH" --target "${REGISTRY}/${IMAGE}:$VERSION"
       env:
-        # Overwrite env to avoid running stage for entire matrix
-        IMAGE=prometheus
-        IMAGE=node_exporter
-        IMAGE=alertmanager
-        IMAGE=blackbox_exporter
+        global:
+          - REGISTRY=carlosedp
+          - QEMU_VERSION=v2.11.0
+      matrix:
+        - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
+        - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+        - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
+        - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
