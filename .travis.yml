@@ -43,11 +43,6 @@ script:
 jobs:
   include:
     - stage: deploy
-      env:
-        - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
-        - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
-        - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
-        - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
 
       script:
         - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-${ARCH}" | cut -d\" -f4)
