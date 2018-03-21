@@ -23,8 +23,8 @@ script:
 # Download
   - git clone https://github.com/prometheus/${IMAGE}
   - curl -L -o qemu-${QEMU_ARCH}-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/${QEMU_VERSION}/qemu-${QEMU_ARCH}-static.tar.gz && tar zx -f qemu-${QEMU_ARCH}-static.tar.gz -C ${IMAGE}
-  - DOWNLOAD_URL=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-${ARCH}" | cut -d\" -f4)
-  - VERSION=v$(echo ${DOWNLOAD_URL}|sed 's/.*\/v\([0-9.]*\)\/.*/\1/')
+  - 'DOWNLOAD_URL=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-${ARCH}" | cut -d\" -f4)'
+  - 'VERSION=v$(echo ${DOWNLOAD_URL}|sed 's/.*\/v\([0-9.]*\)\/.*/\1/')'
   - echo Processing ${IMAGE} version ${VERSION}
   - curl -L -o ${IMAGE}.tar.gz ${DOWNLOAD_URL} && tar zx -f ${IMAGE}.tar.gz --strip-components=1 -C ${IMAGE}
 # Build
