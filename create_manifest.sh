@@ -1,6 +1,6 @@
 set -e
 
-DOWNLOAD_URL=$(curl -s https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-${ARCH}" | cut -d\" -f4)
+DOWNLOAD_URL=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-${ARCH}" | cut -d\" -f4)'
 VERSION=v$(echo ${DOWNLOAD_URL}|sed 's/.*\/v\([0-9.]*\)\/.*/\1/')
 docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
 echo "Downloading manifest-tool"
