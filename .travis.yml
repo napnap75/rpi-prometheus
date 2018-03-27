@@ -11,10 +11,12 @@ env:
     - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
     - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
     - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=snmp_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
     - IMAGE=prometheus TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
     - IMAGE=node_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
     - IMAGE=alertmanager TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
     - IMAGE=blackbox_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+    - IMAGE=snmp_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
 
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
@@ -32,9 +34,6 @@ script:
   - docker build -t ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} ${IMAGE}
 # Check
   - docker images
-  #- if [ ! "${IMAGE}" == "alertmanager" ] ; then
-  #    docker run --rm ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} --version ;
-  #  fi
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
       docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" ;
       docker push ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} ;
@@ -54,3 +53,7 @@ jobs:
     - stage: manifest
       env: IMAGE=blackbox_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
       script: ./create_manifest.sh
+    - stage: manifest
+      env: IMAGE=snmp_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+      script: ./create_manifest.sh
+
