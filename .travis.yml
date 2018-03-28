@@ -31,7 +31,7 @@ script:
   - curl -L -o ${IMAGE}.tar.gz ${DOWNLOAD_URL} && tar zx -f ${IMAGE}.tar.gz --strip-components=1 -C ${IMAGE}
 # Build
   - if [ "$IMAGE" == "snmp_exporter" ]; then
-      cp -rf snmp.yml ${IMAGE}/snmp.yml
+      cp -rf snmp.yml ${IMAGE}/snmp.yml ;
     fi
   - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}-${TAG}.patch
   - docker build -t ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} ${IMAGE}
