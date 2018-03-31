@@ -2,44 +2,61 @@ language: bash
 services: docker
 sudo: required
 
-notifications:
-  slack:
-    email: false
-    rooms:
-      - secure: KYnSm6QnVZit06xZA8++6z3xeX8pYeoNIFkDh0aU0LaZGDJ5+CtgnmAzoBMi3Kn523s1jSbGIXY95VTTdr88pVJXzYIFKRPQku8U7Iq80wden/frtjZBUt97bPghlEO73MOIl/hWOAWi0jRKS/h0aGf3iWbyEm8x4VVbta2JRnTSGClXw0Db8UZ+i6VdTMGc59tNPOsEe0wDDY+p1NFEEnLf2lz51tW2SIeoxSK9jq2kDKQwUmHRxyl6ConyJFbCTOhqVw8boq5X5HSPHQpBmtAJNqYJZtR/9rfORJs7ARVBlIWM0qKHwWuLzxhZof4TiFoCshln94OdMtK4Vvu99B0PF7W/mAsBzAYT2d4un1my5Z8fkMgx2eg4g4D1N4fKqViqx/iJnV6J3U6u0SBP3/c0CITpT1lsO9bhgbr1Tr0us3ARE94MPBude2j2yWh9EnnhPQowLC9utv89uvQFyHSy8esBStFElHH6lKKhzTOwsB5ewL4Lk0ziZlUb9amXJDWrB2FHTTYiyoXE4lMLA3HzEYrQKms9heGyqeaUhOWfeLg1iKUzCMKWvOgof7cfY9lsFk1nZqsJJyPDOwq9hmrsH3QGAUyBmn5y57DyfPnDtMaHAkJaqIuLegYGUaNad4x2sxw73hjyXA9Y4USvWj8GPM4u8fyMxZg+KtCJkLw=
-    on_success: change
-    
 env:
-  - IMAGE=prometheus
-  - IMAGE=node_exporter
-  - IMAGE=alertmanager
-  - IMAGE=blackbox_exporter
-  
+  global:
+    - REGISTRY=carlosedp
+    - QEMU_VERSION=v2.11.0
+  matrix:
+    - IMAGE=prometheus TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=node_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=alertmanager TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=blackbox_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=snmp_exporter TAG=arm QEMU_ARCH=arm ARCH=armv7
+    - IMAGE=prometheus TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+    - IMAGE=node_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+    - IMAGE=alertmanager TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+    - IMAGE=blackbox_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+    - IMAGE=snmp_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
-  
+
 script:
 # Download
   - git clone https://github.com/prometheus/${IMAGE}
-  - curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz && tar zx -f qemu-arm-static.tar.gz -C ${IMAGE}
-  - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-armv7" | cut -d\" -f4)
+  - curl -L -o qemu-${QEMU_ARCH}-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/${QEMU_VERSION}/qemu-${QEMU_ARCH}-static.tar.gz && tar zx -f qemu-${QEMU_ARCH}-static.tar.gz -C ${IMAGE}
+  - 'DOWNLOAD_URL=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/repos/prometheus/${IMAGE}/releases/latest | grep "browser_download_url" | grep "linux-${ARCH}" | cut -d\" -f4)'
+  - VERSION=v$(echo ${DOWNLOAD_URL}|sed 's/.*\/v\([0-9.]*\)\/.*/\1/')
+  - echo Processing ${IMAGE} version ${VERSION}
   - curl -L -o ${IMAGE}.tar.gz ${DOWNLOAD_URL} && tar zx -f ${IMAGE}.tar.gz --strip-components=1 -C ${IMAGE}
 # Build
-  - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}.patch
-  - docker build -t napnap75/rpi-prometheus:${IMAGE} ${IMAGE}
+  - if [ "$IMAGE" == "snmp_exporter" ]; then
+      cp -rf snmp.yml ${IMAGE}/snmp.yml ;
+    fi
+  - patch ${IMAGE}/Dockerfile Dockerfile.${IMAGE}-${TAG}.patch
+  - docker build -t ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} ${IMAGE}
 # Check
   - docker images
-  - if [ ! "$IMAGE" == "alertmanager" ] ; then
-      docker run --rm napnap75/rpi-prometheus:${IMAGE} --version ;
-    fi
-    
-after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" ;
-      docker push napnap75/rpi-prometheus:${IMAGE} ;
-      if [ ! "$IMAGE" == "alertmanager" ] ; then
-        VERSION=$(docker run --rm napnap75/rpi-prometheus:${IMAGE} --version 2>&1 | grep "${IMAGE}, version" | egrep -o "[0-9]+\.[0-9]+\.[0-9]+") ;
-        docker tag napnap75/rpi-prometheus:${IMAGE} napnap75/rpi-prometheus:${IMAGE}-${VERSION} ;
-        docker push napnap75/rpi-prometheus:${IMAGE}-${VERSION} ;
-      fi
+      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" ;
+      docker push ${REGISTRY}/${IMAGE}:${VERSION}-${TAG} ;
     fi
+
+jobs:
+  include:
+    - stage: manifest
+      env: IMAGE=prometheus TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+      script: ./create_manifest.sh
+    - stage: manifest
+      env: IMAGE=node_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+      script: ./create_manifest.sh
+    - stage: manifest
+      env: IMAGE=alertmanager TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+      script: ./create_manifest.sh
+    - stage: manifest
+      env: IMAGE=blackbox_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+      script: ./create_manifest.sh
+    - stage: manifest
+      env: IMAGE=snmp_exporter TAG=arm64 QEMU_ARCH=aarch64 ARCH=arm64
+      script: ./create_manifest.sh
+

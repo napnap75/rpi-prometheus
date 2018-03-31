@@ -1,0 +1,6 @@
+1c1,3
+< FROM        quay.io/prometheus/busybox:latest
+---
+> FROM arm32v6/alpine:latest
+> ADD qemu-arm-static /usr/bin
+> RUN apk update && apk add libc6-compat && ln -s /lib/ld-linux-armhf.so.3 /lib/ld-linux.so.3
