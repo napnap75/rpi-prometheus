@@ -9,6 +9,7 @@ The following images are available as tags of napnap75/rpi-prometheus :
 - node_exporter : Prometheus exporter for hardware and OS metrics
 - alertmanager : The Alertmanager handles alerts sent by client applications such as the Prometheus server.
 - blackbox_exporter : The blackbox exporter allows blackbox probing of endpoints over HTTP, HTTPS, DNS, TCP and ICMP.
+- snmp_exporter : The SNMP Exporter exposes information gathered from SNMP
 
 The source code is available [here](https://github.com/napnap75/rpi-prometheus) and the images [here](https://hub.docker.com/r/napnap75/rpi-prometheus/).
 
